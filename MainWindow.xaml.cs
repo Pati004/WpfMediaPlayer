@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
@@ -6,13 +6,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using WpfMediaPlayer;
+using WpfMediaPlayer.ViewModels;
 
-namespace MediaPlayer
+namespace WpfMediaPlayer
 {
     public partial class MainWindow : Window
     {
-        // ObservableCollection za seznam predvajanja
-        private ObservableCollection<MediaItem> playlistItems;
+        // ViewModel instance
+        private ViewModel viewModel;
 
         // Trenutno predvajani element
         private MediaItem currentPlayingItem;
@@ -26,66 +27,17 @@ namespace MediaPlayer
         public MainWindow()
         {
             InitializeComponent();
-            InitializePlaylist();
+
+            // Inicializiramo ViewModel
+            viewModel = new ViewModel();
+
+            // Nastavimo DataContext na ViewModel
+            this.DataContext = viewModel;
+
             InitializeTimer();
 
             currentTimeLabel.Content = "00:00:00";
             totalTimeLabel.Content = "00:00:00";
-        }
-
-        private void InitializePlaylist()
-        {
-            // Ustvarimo ObservableCollection
-            playlistItems = new ObservableCollection<MediaItem>();
-
-            // Dodamo privzete elemente (vsaj 3)
-            playlistItems.Add(new MediaItem(
-                title: "Sunrise Symphony",
-                filePath: "Media/video1.mp4",
-                thumbnailPath: "Thumbnails/video1.jpg",
-                duration: "03:45",
-                genre: "Ambientalna glasba",
-                artist: "Nature Sounds Collective"
-            ));
-
-            playlistItems.Add(new MediaItem(
-                title: "Ocean Waves",
-                filePath: "Media/audio1.mp3",
-                thumbnailPath: "Thumbnails/audio1.jpg",
-                duration: "05:20",
-                genre: "Relaksacijska",
-                artist: "Relaxation Masters"
-            ));
-
-            playlistItems.Add(new MediaItem(
-                title: "Mountain Journey",
-                filePath: "Media/video2.mp4",
-                thumbnailPath: "Thumbnails/video2.jpg",
-                duration: "04:15",
-                genre: "Dokumentarec",
-                artist: "Travel Films"
-            ));
-
-            playlistItems.Add(new MediaItem(
-                title: "Piano Meditation",
-                filePath: "Media/audio2.mp3",
-                thumbnailPath: "Thumbnails/audio2.jpg",
-                duration: "06:30",
-                genre: "Klasična",
-                artist: "Classical Piano Ensemble"
-            ));
-
-            playlistItems.Add(new MediaItem(
-                title: "City Lights",
-                filePath: "Media/video3.mp4",
-                thumbnailPath: "Thumbnails/video3.jpg",
-                duration: "03:55",
-                genre: "Urban",
-                artist: "Urban Filmmakers"
-            ));
-
-            // Povežemo z ListView
-            playlistView.ItemsSource = playlistItems;
         }
 
         private void InitializeTimer()
@@ -177,7 +129,7 @@ namespace MediaPlayer
 
         private void NextButton_Click(object sender, RoutedEventArgs e)
         {
-            if (playlistView.SelectedIndex < playlistItems.Count - 1)
+            if (playlistView.SelectedIndex < viewModel.PlaylistItems.Count - 1)
             {
                 playlistView.SelectedIndex++;
                 PlaySelectedItem();
